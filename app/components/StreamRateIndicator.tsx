@@ -90,7 +90,6 @@ export default function StreamRateIndicator() {
     all of the streams the user is sending.
   */
   const calculateStreamRate = async () => {
-
     /* 
       TODO: #1: Fetch the receiver and sender streams using getReceiverStreams and getSenderStreams. 
             Then, calculate the stream rate by calculating and adding up the rate of APT per second 
@@ -98,6 +97,12 @@ export default function StreamRateIndicator() {
             Return the stream rate.
     */
     let aptPerSec = 0;
+    let receiverStreams = await getReceiverStreams();
+    let senderStreams = await getSenderStreams();
+
+    receiverStreams.completed.forEach((stream) => (aptPerSec += stream));
+
+    senderStreams.forEach((stream) => (aptPerSec -= stream));
 
     return aptPerSec;
   };
@@ -126,11 +131,42 @@ export default function StreamRateIndicator() {
     /*
       TODO: #5: Validate the account is defined before continuing. If not, return.
     */
+    if (!account) {
+      return {
+        pending: [],
+        completed: [],
+        active: [],
+      }; 
+    }
 
     /*
       TODO: #6: Make a request to the view function `get_receivers_streams` to retrieve the streams sent by 
             the user.
     */
+    const body = {
+      function: `${process.env.MODULE_ADDRESS}::${process.env.MODULE_NAME}::get_receiver_streams`,
+      type_arguments: [],
+      arguments: [process.env.MODULE_ADDRESS],
+    };
+
+    let res;
+
+    try {
+      res = await fetch(`https://fullnode.testnet.aptoslabs.com/v1/view`, {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+    } catch (e: any) {
+      console.log("ERROR: " + e.message);
+    }
+
+    const data = await res?.json();
+    console.log(data);
+    
 
     /* 
       TODO: #7: Parse the response from the view request and create an object containing an array of 
