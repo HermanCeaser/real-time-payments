@@ -99,6 +99,8 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
         - Remember to make the API request in a try/catch block. If there is an error, set the 
           balance to "0".
     */
+    
+    
   };
 
   return (
@@ -161,7 +163,7 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
                       {wallet.readyState === WalletReadyState.Installed && (
                         <Button
                           variant="secondary"
-                          onClick={() => connect(wallet.name) }
+                          onClick={() => connect(wallet.name)}
                         >
                           Connect
                         </Button>
@@ -219,6 +221,27 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
             </DropdownMenu>
           </div>
         */}
+
+      {connected && account && (
+        <div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="font-mono">
+                {balance} | {account.address.slice(0, 5)}... {account.address.slice(-4)}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem
+                onClick={() => {
+                  disconnect()
+                }}
+              >
+                Disconnect
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
     </div>
   );
 }
