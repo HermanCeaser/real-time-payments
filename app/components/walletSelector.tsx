@@ -99,8 +99,32 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
         - Remember to make the API request in a try/catch block. If there is an error, set the 
           balance to "0".
     */
-    
-    
+    const DEFAULT_APT = 100000000;
+    const body = {
+      function: "0x1::coin::balance",
+      type_arguments: ["0x1::aptos_coin::AptosCoin"],
+      arguments: [address],
+    };
+
+    let res;
+
+    try {
+      res = await fetch(`https://fullnode.testnet.aptoslabs.com/v1/view`, {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+    } catch (e) {
+      setBalance("0");
+    }
+
+    const data = await res?.json();
+    console.log(data);
+
+    data ? setBalance((data / DEFAULT_APT).toLocaleString()) : setBalance();
   };
 
   return (
@@ -194,6 +218,11 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
             Loading...
           </Button>
         */}
+      {isLoading && (
+        <Button variant="secondary" disabled>
+          Loading...
+        </Button>
+      )}
       {/* 
           TODO: #2: Display the wallet's APT balance and address if the wallet is connected and the 
                 account is defined. Use the component below to display the wallet's APT balance and 
@@ -227,13 +256,14 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button className="font-mono">
-                {balance} | {account.address.slice(0, 5)}... {account.address.slice(-4)}
+                {balance} | {account.address.slice(0, 5)}...{" "}
+                {account.address.slice(-4)}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem
                 onClick={() => {
-                  disconnect()
+                  disconnect();
                 }}
               >
                 Disconnect
