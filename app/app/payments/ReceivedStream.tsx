@@ -111,7 +111,7 @@ export default function ReceivedStream(props: {
   */
   const claimApt = async () => {
     /* 
-      TODO: Set the isTxnInProgress prop to true
+      TODO:: Set the isTxnInProgress prop to true
     */
 
     /* 

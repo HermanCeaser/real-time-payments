@@ -92,7 +92,7 @@ export default function StreamRateIndicator() {
   const calculateStreamRate = async () => {
 
     /* 
-      TODO #1: Fetch the receiver and sender streams using getReceiverStreams and getSenderStreams. 
+      TODO: #1: Fetch the receiver and sender streams using getReceiverStreams and getSenderStreams. 
             Then, calculate the stream rate by calculating and adding up the rate of APT per second 
             for each receiver stream and subtracting the rate of APT per second for each sender stream.
             Return the stream rate.
@@ -104,16 +104,16 @@ export default function StreamRateIndicator() {
 
   const getSenderStreams = async () => {
     /*
-     TODO #2: Validate the account is defined before continuing. If not, return.
+     TODO: #2: Validate the account is defined before continuing. If not, return.
    */
 
     /*
-       TODO #3: Make a request to the view function `get_senders_streams` to retrieve the streams sent by 
+       TODO: #3: Make a request to the view function `get_senders_streams` to retrieve the streams sent by 
              the user.
     */
 
     /* 
-       TODO #4: Parse the response from the view request and create the streams array using the given 
+       TODO: #4: Parse the response from the view request and create the streams array using the given 
              data. Return the new streams array.
  
        HINT:
@@ -124,16 +124,16 @@ export default function StreamRateIndicator() {
 
   const getReceiverStreams = async () => {
     /*
-      TODO #5: Validate the account is defined before continuing. If not, return.
+      TODO: #5: Validate the account is defined before continuing. If not, return.
     */
 
     /*
-      TODO #6: Make a request to the view function `get_receivers_streams` to retrieve the streams sent by 
+      TODO: #6: Make a request to the view function `get_receivers_streams` to retrieve the streams sent by 
             the user.
     */
 
     /* 
-      TODO #7: Parse the response from the view request and create an object containing an array of 
+      TODO: #7: Parse the response from the view request and create an object containing an array of 
             pending, completed, and active streams using the given data. Return the new object.
 
       HINT:

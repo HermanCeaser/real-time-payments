@@ -56,7 +56,7 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
   */
   const ensureAccountExists = async () => {
     /* 
-      TODO #5: Make a request to the api endpoint to retrieve the account data. If the request returns 
+      TODO: #5: Make a request to the api endpoint to retrieve the account data. If the request returns 
             an object that contains `error_code` of `account_not_found`, call the initializeAccount
             function to initialize the account.
     */
@@ -67,21 +67,21 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
   */
   const initializeAccount = async () => {
     /* 
-      TODO #6: Return if the wallet is not connected, the account is not defined, a transaction is 
+      TODO: #6: Return if the wallet is not connected, the account is not defined, a transaction is 
       in progress, or the faucet is loading.
     */
 
     /* 
-      TODO #7: Set the isFaucetLoading state variable to prevent this function from being called again.
+      TODO: #7: Set the isFaucetLoading state variable to prevent this function from being called again.
     */
 
     /* 
-      TODO #8: Create a new faucet client with the testnet network and faucet url. Then, call the
+      TODO: #8: Create a new faucet client with the testnet network and faucet url. Then, call the
       fundAccount function to fund the account with 1 APT. Catch any errors that occur. 
     */
 
     /* 
-      TODO #9: Set the isFaucetLoading state variable to false. 
+      TODO: #9: Set the isFaucetLoading state variable to false. 
     */
 
   }
@@ -94,7 +94,7 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
   const getBalance = async (address: string) => {
     /* 
 
-      TODO #3: Make a call to the 0x1::coin::balance function to get the balance of the given address. 
+      TODO: #3: Make a call to the 0x1::coin::balance function to get the balance of the given address. 
       
       HINT: 
         - The APT balance is return with a certain number of decimal places. Remember to convert the 
@@ -118,7 +118,7 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
               <DialogTitle>Connect your wallet</DialogTitle>
               {
                 /* 
-                  TODO #1: Return a list of all supported wallets. If the wallet is installed, display
+                  TODO: #1: Return a list of all supported wallets. If the wallet is installed, display
                   a button to connect the wallet. If the wallet is not installed, display a button 
                   to install the wallet. 
 
@@ -160,7 +160,7 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
       )}
       {
         /* 
-          TODO #4: Display a loading button if the wallet is currently loading
+          TODO: #4: Display a loading button if the wallet is currently loading
 
           HINT: 
             - Use the `isLoading` variable to check if the wallet is loading.
@@ -174,7 +174,7 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
       }
       {
         /* 
-          TODO #2: Display the wallet's APT balance and address if the wallet is connected and the 
+          TODO: #2: Display the wallet's APT balance and address if the wallet is connected and the 
                 account is defined. Use the component below to display the wallet's APT balance and 
                 address, as well as provide the disconnect button. 
 

@@ -104,20 +104,20 @@ export default function ClaimerPage() {
   */
   const getReceiverStreams = async () => {
     /*
-      TODO #5: Validate the account is defined before continuing. If not, return.
+      TODO: #5: Validate the account is defined before continuing. If not, return.
     */
 
     /* 
-      TODO #6: Set the areStreamsLoading state variable to true
+      TODO: #6: Set the areStreamsLoading state variable to true
     */
 
     /*
-      TODO #7: Make a request to the view function `get_receivers_streams` to retrieve the streams sent by 
+      TODO: #7: Make a request to the view function `get_receivers_streams` to retrieve the streams sent by 
             the user.
     */
 
     /* 
-      TODO #8: Parse the response from the view request and create an object containing an array of 
+      TODO: #8: Parse the response from the view request and create an object containing an array of 
             pending, completed, and active streams using the given data. Return the new object.
 
       HINT:
@@ -145,7 +145,7 @@ export default function ClaimerPage() {
     <>
       {
         /* 
-          TODO #1: Display a loading indicator if a transaction is in progress. Use the given component to display the loading indicator.
+          TODO: #1: Display a loading indicator if a transaction is in progress. Use the given component to display the loading indicator.
 
           HINT:
             - Use the `txnInProgress` variable to check if a transaction is in progress.
@@ -163,7 +163,7 @@ export default function ClaimerPage() {
       <>
         {
           /* 
-            TODO #2: Display an error message if the wallet is connected to the wrong network. Use the 
+            TODO: #2: Display an error message if the wallet is connected to the wrong network. Use the 
                   given components to display the message.
             
             HINT:
@@ -338,7 +338,7 @@ export default function ClaimerPage() {
 
                   {
                     /* 
-                      TODO #3: Display a message if there are no incoming payments of the selected status. 
+                      TODO: #3: Display a message if there are no incoming payments of the selected status. 
                             Use the given components to display the message.
 
                       HINT:
@@ -362,7 +362,7 @@ export default function ClaimerPage() {
 
                   {
                     /*
-                      TODO #4: Display the incoming payments of the selected status. Use the given components to display the streams. 
+                      TODO: #4: Display the incoming payments of the selected status. Use the given components to display the streams. 
                               Sort the streams based on the selected sorting method.
 
                       HINT:

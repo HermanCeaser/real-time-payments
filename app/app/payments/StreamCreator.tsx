@@ -78,24 +78,24 @@ export default function StreamCreator(props: {
   */
   const startStream = async () => {
     /* 
-      TODO #1: Validate the address, amount, and date are all defined before continuing. Return early 
+      TODO:: #1: Validate the address, amount, and date are all defined before continuing. Return early 
             if any of the variables are undefined.
     */
 
     /* 
-      TODO #2: Return early if the amount is not a number or is less than 0.
+      TODO: #2: Return early if the amount is not a number or is less than 0.
     */
 
     /* 
-      TODO #3: Set the isTxnInProgress prop to true
+      TODO: #3: Set the isTxnInProgress prop to true
     */
 
     /* 
-      TODO #4: Reset the address, amount, and date state variables
+      TODO: #4: Reset the address, amount, and date state variables
     */
 
     /* 
-      TODO #5: Create the payload for the create_stream transaction
+      TODO: #5: Create the payload for the create_stream transaction
 
       HINT: 
         - Note that the amount is in floating point format, but the transaction expects an integer 
@@ -104,7 +104,7 @@ export default function StreamCreator(props: {
     */
 
     /* 
-      TODO #6: In a try/catch block, sign and submit the transaction using the signAndSubmitTransaction
+      TODO: #6: In a try/catch block, sign and submit the transaction using the signAndSubmitTransaction
             function provided by the wallet adapter. Use the payload created above.
      
       HINT: 
@@ -130,7 +130,7 @@ export default function StreamCreator(props: {
     */
 
     /* 
-      TODO #7: Set the isTxnInProgress prop to false
+      TODO: #7: Set the isTxnInProgress prop to false
     */
 
   };
