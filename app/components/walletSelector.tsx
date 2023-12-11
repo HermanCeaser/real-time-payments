@@ -57,10 +57,26 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
   */
   const ensureAccountExists = async () => {
     /* 
-      TODO: #5: Make a request to the api endpoint to retrieve the account data. If the request returns 
+      STEPS: #5: Make a request to the api endpoint to retrieve the account data. If the request returns 
             an object that contains `error_code` of `account_not_found`, call the initializeAccount
             function to initialize the account.
     */
+    const response = await fetch(
+      `https://fullnode.testnet.aptoslabs.com/v1/accounts/${account.address}`,
+      {
+        method: "GET",
+      }
+    );
+
+    // Parsing the response into a json
+    const accountData = await response.json();
+
+    // If the response is the error code for account not found, the account has not been initialized
+    if (accountData.error_code == "account_not_found") {
+      initializeAccount();
+    }
+
+    console.log(accountData);
   };
 
   /* 
@@ -68,19 +84,35 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
   */
   const initializeAccount = async () => {
     /* 
-      TODO: #6: Return if the wallet is not connected, the account is not defined, a transaction is 
+      STEPS: #6: Return if the wallet is not connected, the account is not defined, a transaction is 
       in progress, or the faucet is loading.
     */
+    if (!connected || !account || isFaucetLoading || props.isTxnInProgress) {
+      return;
+    }
     /* 
-      TODO: #7: Set the isFaucetLoading state variable to prevent this function from being called again.
+      STEPS: #7: Set the isFaucetLoading state variable to prevent this function from being called again.
     */
+    setIsFaucetLoading(true);
+
     /* 
-      TODO: #8: Create a new faucet client with the testnet network and faucet url. Then, call the
+      STEPS: #8: Create a new faucet client with the testnet network and faucet url. Then, call the
       fundAccount function to fund the account with 1 APT. Catch any errors that occur. 
     */
+    const faucetClient = new FaucetClient(
+      Network.TESTNET,
+      "https://faucet.testnet.aptoslabs.com"
+    );
+
+    try {
+      await faucetClient.fundAccount(account.address, 100000000, 1);
+    } catch (e) {
+      console.log(e);
+    }
     /* 
-      TODO: #9: Set the isFaucetLoading state variable to false. 
+      STEPS: #9: Set the isFaucetLoading state variable to false. 
     */
+    setIsFaucetLoading(false);
   };
 
   /*
@@ -91,7 +123,7 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
   const getBalance = async (address: string) => {
     /* 
 
-      TODO: #3: Make a call to the 0x1::coin::balance function to get the balance of the given address. 
+      STEPS: #3: Make a call to the 0x1::coin::balance function to get the balance of the given address. 
       
       HINT: 
         - The APT balance is return with a certain number of decimal places. Remember to convert the 
@@ -122,9 +154,8 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
     }
 
     const data = await res?.json();
-    console.log(data);
 
-    data ? setBalance((data / DEFAULT_APT).toLocaleString()) : setBalance();
+    setBalance((data / DEFAULT_APT).toLocaleString()) ;
   };
 
   return (
@@ -141,7 +172,7 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
               <DialogTitle>Connect your wallet</DialogTitle>
               {
                 /* 
-                  TODO: #1: Return a list of all supported wallets. If the wallet is installed, display
+                  STEPS: #1: Return a list of all supported wallets. If the wallet is installed, display
                   a button to connect the wallet. If the wallet is not installed, display a button 
                   to install the wallet. 
 
@@ -207,7 +238,7 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
         </Dialog>
       )}
       {/* 
-          TODO: #4: Display a loading button if the wallet is currently loading
+          STEPS: #4: Display a loading button if the wallet is currently loading
 
           HINT: 
             - Use the `isLoading` variable to check if the wallet is loading.
@@ -224,7 +255,7 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
         </Button>
       )}
       {/* 
-          TODO: #2: Display the wallet's APT balance and address if the wallet is connected and the 
+          STEPS: #2: Display the wallet's APT balance and address if the wallet is connected and the 
                 account is defined. Use the component below to display the wallet's APT balance and 
                 address, as well as provide the disconnect button. 
 
