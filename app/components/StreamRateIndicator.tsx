@@ -255,9 +255,7 @@ export default function StreamRateIndicator() {
         completed: completedStreams,
         active: activeStreams,
       };
-
     } catch (e: any) {
-      
       console.log("ERROR: " + e.message);
 
       return {
