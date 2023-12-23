@@ -21,6 +21,7 @@ import {
 import WalletSelector from "@/components/walletSelector";
 import StreamRateIndicator from "@/components/StreamRateIndicator";
 import { useRouter } from "next/router";
+import ThemeToggle from "@/components/ThemeToggle";
 
 // List of supported wallets to be used by the AptosWalletAdapterProvider below.
 //
@@ -107,6 +108,7 @@ export default function RootLayout({
                 <div className="flex flex-row justify-center gap-3">
                   <StreamRateIndicator />
                   <WalletSelector />
+                  {/* <ThemeToggle /> */}
                 </div>
               </div>
             </div>

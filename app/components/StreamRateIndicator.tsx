@@ -76,6 +76,8 @@ export default function StreamRateIndicator() {
   // stream rate state
   const [streamRate, setStreamRate] = useState(0);
 
+  const DEFAULT_APT = 100000000;
+
   /* 
     Calculates and sets the stream rate
   */
@@ -100,53 +102,31 @@ export default function StreamRateIndicator() {
     let receiverStreams = await getReceiverStreams();
     let senderStreams = await getSenderStreams();
 
-    receiverStreams.completed.forEach((stream) => (aptPerSec += stream));
+    receiverStreams.completed.forEach(
+      (stream) => (aptPerSec += stream.amountAptFloat)
+    );
 
-    senderStreams.forEach((stream) => (aptPerSec -= stream));
+    senderStreams.forEach((stream) => (aptPerSec -= stream.amountAptFloat));
 
     return aptPerSec;
   };
 
-  const getSenderStreams = async () => {
+  const getSenderStreams = async (): Promise<Stream[]> => {
     /*
      TODO: #2: Validate the account is defined before continuing. If not, return.
    */
+    if (!account) {
+      return [];
+    }
 
     /*
        TODO: #3: Make a request to the view function `get_senders_streams` to retrieve the streams sent by 
              the user.
     */
-
-    /* 
-       TODO: #4: Parse the response from the view request and create the streams array using the given 
-             data. Return the new streams array.
- 
-       HINT:
-        - Remember to convert the amount to floating point number
-    */
-    return [];
-  };
-
-  const getReceiverStreams = async () => {
-    /*
-      TODO: #5: Validate the account is defined before continuing. If not, return.
-    */
-    if (!account) {
-      return {
-        pending: [],
-        completed: [],
-        active: [],
-      }; 
-    }
-
-    /*
-      TODO: #6: Make a request to the view function `get_receivers_streams` to retrieve the streams sent by 
-            the user.
-    */
     const body = {
-      function: `${process.env.MODULE_ADDRESS}::${process.env.MODULE_NAME}::get_receiver_streams`,
+      function: `${process.env.MODULE_ADDRESS}::${process.env.MODULE_NAME}::get_senders_streams`,
       type_arguments: [],
-      arguments: [process.env.MODULE_ADDRESS],
+      arguments: [account.address],
     };
 
     let res;
@@ -160,17 +140,82 @@ export default function StreamRateIndicator() {
           Accept: "application/json",
         },
       });
+
+      const [senders, recipients, amounts, durations, timestamps, streamIds] =
+        await res.json();
+
+      /* 
+       TODO: #4: Parse the response from the view request and create the streams array using the given 
+             data. Return the new streams array. 
+       HINT:
+        - Remember to convert the amount to floating point number
+    */
+      const streams: Stream[] = [];
+      recipients.forEach((recipient: string, index: number) => {
+        const stream: Stream = {
+          sender: senders[index],
+          recipient: recipient,
+          amountAptFloat: amounts[index] / DEFAULT_APT,
+          durationMilliseconds: 1e3 * durations[index],
+          startTimestampMilliseconds: 1e3 * timestamps[index],
+          streamId: streamIds[index],
+        };
+        streams.push(stream);
+      });
+
+      return streams;
+
     } catch (e: any) {
       console.log("ERROR: " + e.message);
+      return [];
+    }
+  };
+
+  const getReceiverStreams = async (): Promise<{
+    pending: Stream[];
+    completed: Stream[];
+    active: Stream[];
+  }> => {
+    /*
+      TODO: #5: Validate the account is defined before continuing. If not, return.
+    */
+    if (!account) {
+      return {
+        pending: [],
+        completed: [],
+        active: [],
+      };
     }
 
-    const data = await res?.json();
-    console.log(data);
-    
+    /*
+      TODO: #6: Make a request to the view function `get_receivers_streams` to retrieve the streams sent by 
+            the user.
+    */
+    const body = {
+      function: `${process.env.MODULE_ADDRESS}::${process.env.MODULE_NAME}::get_receivers_streams`,
+      type_arguments: [],
+      arguments: [account.address],
+    };
 
-    /* 
+    let res;
+
+    try {
+      res = await fetch(`https://fullnode.testnet.aptoslabs.com/v1/view`, {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+
+      const [senders, recipients, amounts, durations, timestamps, streamIds] =
+        await res.json();
+
+      /* 
       TODO: #7: Parse the response from the view request and create an object containing an array of 
             pending, completed, and active streams using the given data. Return the new object.
+      
 
       HINT:
         - Remember to convert the amount to floating point number
@@ -179,11 +224,48 @@ export default function StreamRateIndicator() {
         - Mark a stream as completed if the start timestamp + duration is less than the current time
         - Mark a stream as active if it is not pending or completed
     */
-    return {
-      pending: [],
-      completed: [],
-      active: [],
-    };
+      const pendingStreams: Stream[] = [];
+      const completedStreams: Stream[] = [];
+      const activeStreams: Stream[] = [];
+
+      senders.forEach((sender: string, index: number) => {
+        const stream: Stream = {
+          sender: sender,
+          recipient: recipients[index],
+          amountAptFloat: amounts[index] / 1e8,
+          durationMilliseconds: 1e3 * durations[index],
+          startTimestampMilliseconds: 1e3 * timestamps[index],
+          streamId: streamIds[index],
+        };
+
+        if (stream.startTimestampMilliseconds === 0) {
+          pendingStreams.push(stream);
+        } else if (
+          stream.startTimestampMilliseconds + stream.durationMilliseconds <
+          Date.now()
+        ) {
+          completedStreams.push(stream);
+        } else {
+          activeStreams.push(stream);
+        }
+      });
+
+      return {
+        pending: pendingStreams,
+        completed: completedStreams,
+        active: activeStreams,
+      };
+
+    } catch (e: any) {
+      
+      console.log("ERROR: " + e.message);
+
+      return {
+        pending: [],
+        completed: [],
+        active: [],
+      };
+    }
   };
 
   if (!connected) {

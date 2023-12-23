@@ -287,7 +287,7 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button className="font-mono">
-                {balance} | {account.address.slice(0, 5)}...{" "}
+                {balance} APT | {account.address.slice(0, 5)}...{" "}
                 {account.address.slice(-4)}
               </Button>
             </DropdownMenuTrigger>
