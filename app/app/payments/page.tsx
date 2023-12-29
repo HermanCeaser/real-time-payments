@@ -89,6 +89,8 @@ export default function ClaimerPage() {
         });
         setAreStreamsLoading(false);
       });
+
+      
     }
   }, [account, connected, txnInProgress]);
 
@@ -149,7 +151,7 @@ export default function ClaimerPage() {
         },
       });
 
-      const [senders, recipients, amounts, durations, timestamps, streamIds] =
+      const [senders, timestamps, durations, amounts, streamIds] =
         await res.json();
 
       const pendingStreams: Stream[] = [];
@@ -159,7 +161,7 @@ export default function ClaimerPage() {
       senders.forEach((sender: string, index: number) => {
         const stream: Stream = {
           sender: sender,
-          recipient: recipients[index],
+          recipient: account.address,
           amountAptFloat: amounts[index] / 1e8,
           durationMilliseconds: 1e3 * durations[index],
           startTimestampMilliseconds: 1e3 * timestamps[index],
@@ -177,6 +179,7 @@ export default function ClaimerPage() {
           activeStreams.push(stream);
         }
       });
+
 
       return {
         Pending: pendingStreams,

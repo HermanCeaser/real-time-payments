@@ -46,6 +46,71 @@ export default function CreatedStreamList(props: {
     Retrieve the streams from the module and set the streams state.
   */
   useEffect(() => {
+    /* 
+    Retrieves the sender streams. 
+  */
+    const getSenderStreams = async () => {
+      /*
+      TODO #4: Validate the account is defined before continuing. If not, return.
+    */
+      if (!account) {
+        return [];
+      }
+
+      /*
+      TODO #5: Make a request to the view function `get_senders_streams` to retrieve the streams sent by 
+            the user.
+    */
+      const body = {
+        function: `${process.env.MODULE_ADDRESS}::${process.env.MODULE_NAME}::get_senders_streams`,
+        type_arguments: [],
+        arguments: [account.address],
+      };
+
+      let res;
+
+      try {
+        res = await fetch(`https://fullnode.testnet.aptoslabs.com/v1/view`, {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        });
+
+        /* 
+      TODO #6: Parse the response from the view request and create the streams array using the given 
+            data. Return the new streams array.
+
+      HINT:
+        - Remember to convert the amount to floating point number
+    */
+
+        const [recipients, timestamps, durations, amounts, streamIds] =
+          await res.json();
+
+        const streams: Stream[] = [];
+        recipients.forEach((recipient: string, index: number) => {
+          console.log("index: " + index);
+          const stream: Stream = {
+            sender: account.address,
+            recipient: recipient,
+            amountAptFloat: parseFloat(amounts[index]) / 1e8,
+            durationMilliseconds: 1e3 * durations[index],
+            startTimestampMilliseconds: 1e3 * timestamps[index],
+            streamId: streamIds[index],
+          };
+          streams.push(stream);
+        });
+
+        return streams;
+      } catch (e: any) {
+        console.log("ERROR: " + e.message);
+        return [];
+      }
+    };
+
     if (connected) {
       getSenderStreams().then((streams) => {
         setStreams(streams);
@@ -67,36 +132,16 @@ export default function CreatedStreamList(props: {
     /* 
       TODO #8: Set the isTxnInProgress state to true. This will display the loading spinner.
     */
-    props.setTxn(false);
+    props.setTxn(true);
     /*
       TODO #9: Make a request to the entry function `cancel_stream` to cancel the stream. 
       
-      HINT: 
-        - In case of an error, set the isTxnInProgress state to false and return.
-        - In case of success, display a toast notification with the transaction hash.
-
-      -- Toast notification --
-      toast({
-        title: "Stream closed!",
-        description: `Closed stream for ${`${recipient.slice(
-          0,
-          6
-        )}...${recipient.slice(-4)}`}`,
-        action: (
-          <a
-            href={`PLACEHOLDER: Input the explorer link here with the transaction hash`}
-            target="_blank"
-          >
-            <ToastAction altText="View transaction">View txn</ToastAction>
-          </a>
-        ),
-      });
     */
     const payload = {
       type: "entry_function_payload",
       function: `${process.env.MODULE_ADDRESS}::${process.env.MODULE_NAME}::cancel_stream`,
       type_arguments: [],
-      arguments: [recipient],
+      arguments: [account.address, recipient],
     };
 
     let res;
@@ -104,7 +149,6 @@ export default function CreatedStreamList(props: {
       res = await signAndSubmitTransaction(payload);
 
       const response = await res.json();
-      console.log(response);
 
       if (response) {
         toast({
@@ -132,71 +176,7 @@ export default function CreatedStreamList(props: {
       TODO #10: Set the isTxnInProgress state to false. This will hide the loading spinner.
     */
     props.setTxn(false);
-  };
-
-  /* 
-    Retrieves the sender streams. 
-  */
-  const getSenderStreams = async () => {
-    /*
-      TODO #4: Validate the account is defined before continuing. If not, return.
-    */
-    if (!account) {
-      return [];
-    }
-
-    /*
-      TODO #5: Make a request to the view function `get_senders_streams` to retrieve the streams sent by 
-            the user.
-    */
-    const body = {
-      function: `${process.env.MODULE_ADDRESS}::${process.env.MODULE_NAME}::get_senders_streams`,
-      type_arguments: [],
-      arguments: [account.address],
-    };
-
-    let res;
-
-    try {
-      res = await fetch(`https://fullnode.testnet.aptoslabs.com/v1/view`, {
-        method: "POST",
-        body: JSON.stringify(body),
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      });
-
-      /* 
-      TODO #6: Parse the response from the view request and create the streams array using the given 
-            data. Return the new streams array.
-
-      HINT:
-        - Remember to convert the amount to floating point number
-    */
-
-      const [recipients, timestamps, durations, amounts, streamIds] =
-        await res.json();
-
-      const streams: Stream[] = [];
-      recipients.forEach((recipient: string, index: number) => {
-        console.log("index: " + index);
-        const stream: Stream = {
-          sender: account.address,
-          recipient: recipient,
-          amountAptFloat: parseFloat(amounts[index]) / 1e8,
-          durationMilliseconds: 1e3 * durations[index],
-          startTimestampMilliseconds: 1e3 * timestamps[index],
-          streamId: streamIds[index],
-        };
-        streams.push(stream);
-      });
-
-      return streams;
-    } catch (e: any) {
-      console.log("ERROR: " + e.message);
-      return [];
-    }
+    return;
   };
 
   return (

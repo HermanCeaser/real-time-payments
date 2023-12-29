@@ -99,7 +99,7 @@ export default function StreamCreator(props: {
     /* 
       TODO: #3: Set the isTxnInProgress prop to true
     */
-    props.setTxn(false);
+    props.setTxn(true);
 
     /* 
       TODO: #4: Reset the address, amount, and date state variables
@@ -168,6 +168,7 @@ export default function StreamCreator(props: {
       TODO: #7: Set the isTxnInProgress prop to false
     */
    props.setTxn(false);
+   return;
   };
 
   return (
