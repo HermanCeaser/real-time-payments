@@ -194,7 +194,7 @@ export default function CreatedStreamList(props: {
 
       return streams;
     } catch (e: any) {
-      console.log("ERROR: " + e);
+      console.log("ERROR: " + e.message);
       return [];
     }
   };
@@ -264,7 +264,7 @@ export default function CreatedStreamList(props: {
                 -- message component --
 
                 */
-              !areStreamsLoading && !streams && (
+              !areStreamsLoading && streams.length == 0 && (
                 <TableRow className="hover:bg-neutral-400">
                   <TableCell colSpan={5}>
                     <p className="break-normal text-center font-matter py-4 text-neutral-100">
@@ -287,7 +287,7 @@ export default function CreatedStreamList(props: {
                 
               */}
             {!areStreamsLoading &&
-              streams &&
+              streams.length > 0 &&
               streams.map((stream, index) => {
                 const isStreamNotStarted =
                   stream.startTimestampMilliseconds === 0;
