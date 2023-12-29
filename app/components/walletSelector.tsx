@@ -76,7 +76,7 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
       initializeAccount();
     }
 
-    console.log(accountData);
+
   };
 
   /* 

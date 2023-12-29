@@ -141,9 +141,8 @@ export default function StreamRateIndicator() {
         },
       });
 
-      const [senders, recipients, amounts, durations, timestamps, streamIds] =
+      const [recipients, timestamps, durations, amounts, streamIds] =
         await res.json();
-
       /* 
        TODO: #4: Parse the response from the view request and create the streams array using the given 
              data. Return the new streams array. 
@@ -153,9 +152,9 @@ export default function StreamRateIndicator() {
       const streams: Stream[] = [];
       recipients.forEach((recipient: string, index: number) => {
         const stream: Stream = {
-          sender: senders[index],
+          sender: account.address,
           recipient: recipient,
-          amountAptFloat: amounts[index] / DEFAULT_APT,
+          amountAptFloat: parseFloat(amounts[index]) / DEFAULT_APT,
           durationMilliseconds: 1e3 * durations[index],
           startTimestampMilliseconds: 1e3 * timestamps[index],
           streamId: streamIds[index],
@@ -209,7 +208,7 @@ export default function StreamRateIndicator() {
         },
       });
 
-      const [senders, recipients, amounts, durations, timestamps, streamIds] =
+      const [senders, timestamps, durations, amounts, streamIds] =
         await res.json();
 
       /* 
@@ -231,8 +230,8 @@ export default function StreamRateIndicator() {
       senders.forEach((sender: string, index: number) => {
         const stream: Stream = {
           sender: sender,
-          recipient: recipients[index],
-          amountAptFloat: amounts[index] / 1e8,
+          recipient: account.address,
+          amountAptFloat: parseFloat(amounts[index]) / 1e8,
           durationMilliseconds: 1e3 * durations[index],
           startTimestampMilliseconds: 1e3 * timestamps[index],
           streamId: streamIds[index],

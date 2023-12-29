@@ -153,7 +153,7 @@ export default function StreamCreator(props: {
           6
         )}...${address.slice(-4)}`} for ${amount} APT`,
         action: (
-          <a href={`https://explorer.aptoslabs.com/txn/${res[0].hash}/userTxnOverview?network=testnet`} target="_blank">
+          <a href={`https://explorer.aptoslabs.com/txn/${res.hash}/userTxnOverview?network=testnet`} target="_blank">
             <ToastAction altText="View transaction">View txn</ToastAction>
           </a>
         ),
