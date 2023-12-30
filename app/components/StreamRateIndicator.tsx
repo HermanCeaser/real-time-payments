@@ -102,11 +102,23 @@ export default function StreamRateIndicator() {
     let receiverStreams = await getReceiverStreams();
     let senderStreams = await getSenderStreams();
 
-    receiverStreams.completed.forEach(
-      (stream) => (aptPerSec += stream.amountAptFloat)
+    receiverStreams.Active.forEach(
+      (stream) =>
+        (aptPerSec +=
+          stream.amountAptFloat / (stream.durationMilliseconds / 1e3))
     );
 
-    senderStreams.forEach((stream) => (aptPerSec -= stream.amountAptFloat));
+    senderStreams.forEach((stream) => {
+      if (
+        stream.startTimestampMilliseconds + stream.durationMilliseconds <
+          Date.now() ||
+        stream.startTimestampMilliseconds === 0
+      ) {
+        return;
+      }
+
+      aptPerSec -= stream.amountAptFloat / (stream.durationMilliseconds / 1e3);
+    });
 
     return aptPerSec;
   };
@@ -163,7 +175,6 @@ export default function StreamRateIndicator() {
       });
 
       return streams;
-
     } catch (e: any) {
       console.log("ERROR: " + e.message);
       return [];
@@ -171,18 +182,18 @@ export default function StreamRateIndicator() {
   };
 
   const getReceiverStreams = async (): Promise<{
-    pending: Stream[];
-    completed: Stream[];
-    active: Stream[];
+    Pending: Stream[];
+    Completed: Stream[];
+    Active: Stream[];
   }> => {
     /*
       TODO: #5: Validate the account is defined before continuing. If not, return.
     */
     if (!account) {
       return {
-        pending: [],
-        completed: [],
-        active: [],
+        Pending: [],
+        Completed: [],
+        Active: [],
       };
     }
 
@@ -207,6 +218,8 @@ export default function StreamRateIndicator() {
           Accept: "application/json",
         },
       });
+
+      //  const [recipients, timestamps, durations, amounts, streamIds];
 
       const [senders, timestamps, durations, amounts, streamIds] =
         await res.json();
@@ -240,7 +253,7 @@ export default function StreamRateIndicator() {
         if (stream.startTimestampMilliseconds === 0) {
           pendingStreams.push(stream);
         } else if (
-          stream.startTimestampMilliseconds + stream.durationMilliseconds <
+          stream.startTimestampMilliseconds + stream.durationMilliseconds <=
           Date.now()
         ) {
           completedStreams.push(stream);
@@ -250,17 +263,17 @@ export default function StreamRateIndicator() {
       });
 
       return {
-        pending: pendingStreams,
-        completed: completedStreams,
-        active: activeStreams,
+        Pending: pendingStreams,
+        Completed: completedStreams,
+        Active: activeStreams,
       };
     } catch (e: any) {
       console.log("ERROR: " + e.message);
 
       return {
-        pending: [],
-        completed: [],
-        active: [],
+        Pending: [],
+        Completed: [],
+        Active: [],
       };
     }
   };

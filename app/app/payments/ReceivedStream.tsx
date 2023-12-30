@@ -468,7 +468,9 @@ export default function ReceivedStream(props: {
             };
         }
       });
-    return filteredEvents;
+
+    // set the event state using setEvent
+    setEvents(filteredEvents);
   };
 
   return (
@@ -528,8 +530,6 @@ export default function ReceivedStream(props: {
                 <p>{props.amountAptFloat}</p>
               )
             }
-
-            
 
             {
               /* 
@@ -624,13 +624,17 @@ export default function ReceivedStream(props: {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {/* 
+                    {
+                      /* 
                         TODO: Show a skeleton row if the events array is empty
 
                         HINT: 
                           - Use the events array to determine if the events are empty
 
                         -- skeleton row --
+                        
+                      */
+                      events.length === 0 && (
                         <TableRow>
                           <TableCell className="items-center">
                             <div className="flex flex-row justify-center items-center w-full">
@@ -648,65 +652,90 @@ export default function ReceivedStream(props: {
                             </div>
                           </TableCell>
                         </TableRow>
-                      */}
-                    {/* 
+                      )
+                    }
+                    {
+                      /* 
                         TODO: Display each event in the events array with the following format:
                       
                         -- table row -- 
-                        <TableRow key={event.timestamp}>
-                          <TableCell className="text-center">
-                            TODO: Display the event type based on the event.type
-
-                            HINT: 
-                              - Use the event.type to determine the type of the event
-                              - For each event type, display the following text:
-                                - stream_created: 
+                        
+                      */
+                      events.length > 0 &&
+                        events.map((event) => {
+                          return (
+                            <TableRow key={event.timestamp}>
+                              <TableCell className="text-center">
+                                {event.type === "stream_created" && (
                                   <>
                                     <span className="font-mono">
                                       Stream created
                                     </span>
                                   </>
-                                - stream_accepted: 
+                                )}
+
+                                {event.type === "stream_accepted" && (
                                   <>
                                     <span className="font-mono">
                                       Stream accepted
                                     </span>
                                   </>
-                                - stream_claimed: APT claimed
-                                - stream_cancelled: Stream canceled
-                          </TableCell>
-                          <TableCell className="text-center">
-                            PLACEHOLDER: Display the event timestamp in a readable format
-                          </TableCell>
-                          <TableCell className="text-center">
-                            TODO: Display the event data based on the event.type
+                                )}
+                                {event.type === "stream_claimed" && (
+                                  <>APT claimed</>
+                                )}
 
-                            HINT: 
-                              - Use the event.type to determine the type of the event
-                              - For each event type, display the following text:
-                                - stream_created: 
+                                {event.type === "stream_cancelled" && (
+                                  <>Stream cancelled</>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-center">
+                                {new Intl.DateTimeFormat('en-US', {
+                                  year: 'numeric',
+                                  month: '2-digit',
+                                  day: '2-digit',
+                                  hour: 'numeric',
+                                  minute: '2-digit',
+                                  second: '2-digit',
+                                  hour12: true
+                                }).format(new Date(event.timestamp))}
+                              </TableCell>
+                              <TableCell className="text-center">
+                                {/* stream_created: */}
+                                {event.type === "stream_created" && (
                                   <>
                                     <span className="font-mono">
                                       {event.data.amount} APT streaming
                                     </span>
                                   </>
-                                - stream_accepted: 
+                                )}
+                                {/* - stream_accepted: */}
+                                {event.type === "stream_accepted" && (
                                   <>
                                     <span className="font-mono">No data</span>
                                   </>
-                                - stream_claimed: 
+                                )}
+                                {/* - stream_claimed: */}
+                                {event.type === "stream_claimed" && (
                                   <>
-                                    <span className="font-mono">APT claimed</span>
+                                    <span className="font-mono">
+                                     { event.data.amount} APT claimed
+                                    </span>
                                   </>
-                                - stream_cancelled: 
+                                )}
+                                {/* - stream_cancelled: */}
+                                {event.type === "stream_cancelled" && (
                                   <>
-                                  <span className="font-mono">
-                                    Stream canceled
-                                  </span>
-                                </>
-                          </TableCell>
-                        </TableRow>
-                      */}
+                                    <span className="font-mono">
+                                      Stream canceled
+                                    </span>
+                                  </>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })
+                    }
                   </TableBody>
                 </Table>
               </DialogContent>
@@ -731,22 +760,20 @@ export default function ReceivedStream(props: {
                       /*
                         TODO: Copy the sender address to the clipboard and show a toast notification
                         with a link to the sender account on the explorer
-
-                        -- toast --
-                        toast({
-                          description: "Address copied to clipboard",
-                          action: (
-                            <a
-                              href={`PLACEHOLDER: Input the link to the sender account on the explorer here`}
-                              target="_blank"
-                            >
-                              <ToastAction altText="View account on explorer">
-                                View on explorer
-                              </ToastAction>
-                            </a>
-                          ),
-                        });
                       */
+                      toast({
+                        description: "Address copied to clipboard",
+                        action: (
+                          <a
+                            href={`https://explorer.aptoslabs.com/account/${props.senderAddress}?network=testnet`}
+                            target="_blank"
+                          >
+                            <ToastAction altText="View account on explorer">
+                              View on explorer
+                            </ToastAction>
+                          </a>
+                        ),
+                      });
                     }}
                   >
                     <p className="">
@@ -764,7 +791,8 @@ export default function ReceivedStream(props: {
               </Tooltip>
             </TooltipProvider>
           </div>
-          {/* 
+          {
+            /* 
               TODO: Display the end time if the stream has been accepted
 
               -- end time --
@@ -776,8 +804,23 @@ export default function ReceivedStream(props: {
                   ).toLocaleString()}
                 </p>
               </div>
-            */}
-          {/* 
+            */
+            props.startTimestampSeconds !== 0 &&
+              props.durationSeconds + props.startTimestampSeconds >
+                Date.now() / 1e3 && (
+                <div className="w-full flex flex-row gap-3 items-center justify-between">
+                  <p className="text-neutral-100 text-sm">End:</p>
+                  <p className="text-end text-sm">
+                    {new Date(
+                      (props.startTimestampSeconds + props.durationSeconds) *
+                        1000
+                    ).toLocaleString()}
+                  </p>
+                </div>
+              )
+          }
+          {
+            /* 
               TODO: Display the duration if the stream has not been accepted yet
 
               -- duration --
@@ -787,13 +830,23 @@ export default function ReceivedStream(props: {
                   {parseDurationShort(props.durationSeconds * 1000)}
                 </span>
               </div>
-            */}
+            */
+            props.startTimestampSeconds === 0 && (
+              <div className="w-full flex flex-row items-center justify-between">
+                <p className="text-neutral-100 text-sm">Duration:</p>
+                <span className="font-matter">
+                  {parseDurationShort(props.durationSeconds * 1000)}
+                </span>
+              </div>
+            )
+          }
         </div>
       </CardContent>
 
       <CardFooter>
         <div className="flex flex-row justify-between w-full gap-4 p-4">
-          {/* 
+          {
+            /* 
               TODO: Display the claim button if the stream is active (accepted, but not completed) and 
               the accept button if the stream is not accepted yet.
 
@@ -812,8 +865,32 @@ export default function ReceivedStream(props: {
               >
                 Accept
               </Button>
-            */}
-          {/* 
+            */
+            props.startTimestampSeconds !== 0 &&
+            props.durationSeconds + props.startTimestampSeconds >
+              Date.now() / 1000 ? (
+              <Button
+                className="grow bg-green-800 hover:bg-green-700 text-white"
+                onClick={() => {
+                  claimApt();
+                }}
+              >
+                Claim
+              </Button>
+            ) : (
+              <Button
+                className="grow bg-green-800 hover:bg-green-700 text-white"
+                onClick={() => {
+                  acceptStream();
+                }}
+              >
+                Accept
+              </Button>
+            )
+          }
+          {
+            /* 
+          
               TODO: Display the reject button if the stream is active (accepted, but not completed) and
               the accept button if the stream is not accepted yet.
             
@@ -824,7 +901,20 @@ export default function ReceivedStream(props: {
               >
                 Reject
               </Button>
-            */}
+            */
+            props.startTimestampSeconds !== 0 &&
+              props.durationSeconds + props.startTimestampSeconds <=
+                Date.now() / 1000 && (
+                <Button
+                  className="grow bg-red-800 hover:bg-red-700 text-white font-matter"
+                  onClick={() => {
+                    rejectStream();
+                  }}
+                >
+                  Reject
+                </Button>
+              )
+          }
         </div>
       </CardFooter>
     </Card>

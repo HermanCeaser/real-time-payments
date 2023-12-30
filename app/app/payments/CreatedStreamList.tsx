@@ -92,7 +92,6 @@ export default function CreatedStreamList(props: {
 
         const streams: Stream[] = [];
         recipients.forEach((recipient: string, index: number) => {
-          console.log("index: " + index);
           const stream: Stream = {
             sender: account.address,
             recipient: recipient,
