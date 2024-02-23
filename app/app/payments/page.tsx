@@ -89,9 +89,8 @@ export default function ClaimerPage() {
         });
         setAreStreamsLoading(false);
       });
-
-      
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, connected, txnInProgress]);
 
   /* 
@@ -179,7 +178,6 @@ export default function ClaimerPage() {
           activeStreams.push(stream);
         }
       });
-
 
       return {
         Pending: pendingStreams,
@@ -446,7 +444,35 @@ export default function ClaimerPage() {
                       streams[status].length > 0 && (
                         <div className="grid grid-cols-1 gap-5 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 w-full">
                           {streams[status]
-                            .map((stream) => {
+                            .sort((a, b): number => {
+                              switch (sort) {
+                                case Sort.MostRecent:
+                                  // const val1 = a[streamId] as number;
+                                  return b.streamId - a.streamId;
+                                case Sort.Oldest:
+                                  return a.streamId - b.streamId;
+                                case Sort.TotalAmountHightToLow:
+                                  return b.amountAptFloat - a.amountAptFloat;
+                                case Sort.TotalAmountLowToHigh:
+                                  return a.amountAptFloat - b.amountAptFloat;
+                                case Sort.EndDateFarToClose:
+                                  return (
+                                    a.startTimestampMilliseconds -
+                                    b.startTimestampMilliseconds
+                                  );
+                                case Sort.EndDateCloseToFar:
+                                  return (
+                                    b.startTimestampMilliseconds -
+                                    a.startTimestampMilliseconds
+                                  );
+                                case Sort.ClaimableAmountHighToClose:
+                                  return b.amountAptFloat - a.amountAptFloat;
+                                case Sort.ClaimableAmountCloseToHigh:
+                                  return a.amountAptFloat - b.amountAptFloat;
+                                default:
+                                  return b.streamId - a.streamId;
+                              }
+                            }).map((stream) => {
                               return (
                                 <ReceivedStream
                                   key={stream.streamId}
@@ -463,46 +489,6 @@ export default function ClaimerPage() {
                                   streamId={stream.streamId}
                                 />
                               );
-                            })
-                            .sort((a: Stream, b: Stream) => {
-                              switch (sort) {
-                                case Sort.MostRecent:
-                                  // TODO: Sort streams by most recent
-                                  // HINT: Use the streamId to sort the streams
-
-                                  return b.streamId - a.streamId;
-                                case Sort.Oldest:
-                                  // TODO: Sort streams by oldest
-                                  // HINT: Use the streamId to sort the streams
-                                  return a.streamId - b.streamId;
-                                case Sort.TotalAmountHightToLow:
-                                  // TODO: Sort streams by total amount high to low
-                                  return b.amountAptFloat - a.amountAptFloat;
-                                case Sort.TotalAmountLowToHigh:
-                                  // TODO: Sort streams by total amount low to high
-                                  return a.amountAptFloat - b.amountAptFloat;
-                                case Sort.EndDateFarToClose:
-                                  // TODO: Sort streams by end date far to close
-                                  return (
-                                    a.startTimestampMilliseconds -
-                                    b.startTimestampMilliseconds
-                                  );
-                                case Sort.EndDateCloseToFar:
-                                  // TODO: Sort streams by end date close to far
-                                  return (
-                                    b.startTimestampMilliseconds -
-                                    a.startTimestampMilliseconds
-                                  );
-                                case Sort.ClaimableAmountHighToClose:
-                                  // TODO: Sort streams by claimable amount high to close
-                                  return b.amountAptFloat - a.amountAptFloat;
-                                case Sort.ClaimableAmountCloseToHigh:
-                                  // TODO: Sort streams by claimable amount close to high
-                                  return a.amountAptFloat - b.amountAptFloat;
-                                default:
-                                  // TODO: Sort streams by most recent
-                                  return b.streamId - a.streamId;
-                              }
                             })}
                         </div>
                       )

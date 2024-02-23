@@ -49,6 +49,7 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
         getBalance(account.address);
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connected, account, props.isTxnInProgress, isFaucetLoading]);
 
   /* 
@@ -61,6 +62,7 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
             an object that contains `error_code` of `account_not_found`, call the initializeAccount
             function to initialize the account.
     */
+    if(account){
     const response = await fetch(
       `https://fullnode.testnet.aptoslabs.com/v1/accounts/${account.address}`,
       {
@@ -75,6 +77,7 @@ export default function WalletSelector(props: { isTxnInProgress?: boolean }) {
     if (accountData.error_code == "account_not_found") {
       initializeAccount();
     }
+   }
 
 
   };

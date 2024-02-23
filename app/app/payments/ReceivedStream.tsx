@@ -137,6 +137,26 @@ type StreamCloseEvent = {
   };
 };
 
+type StreamEvent = {
+  version: string;
+  guid: {
+    creation_number: string;
+    account_address: string;
+  };
+  sequence_number: string;
+  type: string;
+  data: {
+    amount?: number;
+    duration_in_seconds?: number;
+    amount_to_recipient?: number;
+    amount_to_sender?: number;
+    receiver_address: string;
+    sender_address: string;
+    stream_id: number;
+    timestamp: number;
+  };
+};
+
 type streamAPIResponse =
   | StreamAcceptEvent
   | StreamClaimEvent
@@ -388,7 +408,7 @@ export default function ReceivedStream(props: {
   */
   const getEventList = async (
     event_store_name: string
-  ): Promise<streamAPIResponse[]> => {
+  ): Promise<StreamEvent[]> => {
     /* 
       TODO: Fetch the event of the event_store_name from the event store and return the result in 
             a promise. 
@@ -413,7 +433,7 @@ export default function ReceivedStream(props: {
       getEventList("stream_close_events"),
     ]);
 
-    const events: streamAPIResponse[] = eventsPromise.flat(1);
+    const events: StreamEvent[] = eventsPromise.flat(1);
     /* 
       TODO: Set the events state with events for the specific stream only. Parse the event data to match the 
             Event type above. 
@@ -424,7 +444,10 @@ export default function ReceivedStream(props: {
         - Remember to convert units when necessary
     */
     const filteredEvents: Event[] = events
-      .filter((event) => event.data.stream_id === props.streamId)
+      .filter(
+        (event) =>
+          event.data.stream_id === props.streamId
+      )
       .map((event) => {
         const eventType = event.type.split("::")[2];
         switch (eventType) {
@@ -433,7 +456,7 @@ export default function ReceivedStream(props: {
               type: "stream_created",
               timestamp: 1000 * event.data.timestamp,
               data: {
-                amount: parseFloat(event.data.amount) / 1e8,
+                amount: event.data?.amount ? event.data.amount / 1e8 : 0,
               },
             };
           case "StreamAcceptEvent":
@@ -447,7 +470,7 @@ export default function ReceivedStream(props: {
               type: "stream_claimed",
               timestamp: 1000 * event.data.timestamp,
               data: {
-                amount: parseFloat(event.data.amount) / 1e8,
+                amount: event.data?.amount ? event.data.amount / 1e8 : 0,
               },
             };
           case "StreamCloseEvent":
@@ -455,9 +478,8 @@ export default function ReceivedStream(props: {
               type: "stream_cancelled",
               timestamp: 1000 * event.data.timestamp,
               data: {
-                amount_to_sender: parseFloat(event.data.amount_to_sender) / 1e8,
-                amount_to_recipient:
-                  parseFloat(event.data.amount_to_recipient) / 1e8,
+                amount_to_sender: event.data?.amount_to_sender ? event.data.amount_to_sender / 1e8 : 0,
+                amount_to_recipient: event.data?.amount_to_recipient ? event.data?.amount_to_recipient / 1e8 : 0,
               },
             };
           default:
